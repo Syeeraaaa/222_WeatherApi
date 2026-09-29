@@ -4,35 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geolocation</title>
+    <style>
+        body { 
+            font-family: 'Quicksand', sans-serif; 
+            max-width: 500px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #ffdde1 0%, #ee9ca7 100%);
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(10px);
+            padding: 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 25px rgba(238, 156, 167, 0.4); 
+            border: 3px solid #fff;
+            width: 100%;
+        }
+        h3 {
+            color: #d63384;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        .identity {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        hr {
+            border: none;
+            height: 2px;
+            background: #ffe0e6;
+            border-radius: 2px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        input { 
+            flex: 1; 
+            padding: 12px 16px; 
+            border: 2px solid #ffccd5; 
+            border-radius: 15px; 
+            outline: none;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #fff9fa;
+        } 
+        input:focus {
+            border-color: #ff758c;
+            box-shadow: 0 0 8px rgba(255, 117, 140, 0.3);
+        }
+        button { 
+            padding: 12px 20px; 
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 15px; 
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 117, 140, 0.4);
+        }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 117, 140, 0.6);
+        }
+        .result { 
+            background: #fff0f3;
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: 2px dashed #ffb3c1;
+            margin-top: 15px; 
+            line-height: 1.8; 
+            color: #555;
+            font-size: 14px;
+        }
+        .result p {
+            margin: 5px 0;
+        }
+        .result b {
+            color: #d63384;
+        }
+    </style>
 </head>
 <body>
-    <h3>Nama: Syeera Silvia Erby</h3>
-    <h3>NIM: 20240140222</h3>
+    <div class="card">
+        <h3>Pencarian Lokasi MapTiler</h3>
+        <p>Nama: Syeera Silvia Erby | NIM: 20240140222</p>
+        <hr>
+        
+        <div style="margin-top: 15px;">
+            <input type="text" id="inputKota" placeholder="Masukkan nama kota (cth: Yogyakarta)">
+            <button onclick="cariLokasi()">Cari</button>
+        </div>
 
-    <p>
-        Kota: 
-        <span id="lokasi"></span>
-    </p>
-
-    <hr>
-
-    <p>
-        Koordinat: 
-        <span id="negara"></span>
-    </p>
+        <div class="result" id="hasilData">
+            <p><b>Lokasi:</b> <span id="valLokasi">-</span></p>
+            <p><b>Negara:</b> <span id="valNegara">-</span></p>
+            <p><b>Provinsi:</b> <span id="valProvinsi">-</span></p>
+            <p><b>Kecamatan:</b> <span id="valKecamatan">-</span></p>
+            <p><b>Longitude:</b> <span id="valLong">-</span></p>
+            <p><b>Latitude:</b> <span id="valLat">-</span></p>
+        </div>
+    </div>
 
     <script>
-        fetch("/api/lokasi")
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
+        function cariLokasi() {
+            const kota = document.getElementById("inputKota").value;
+            const url = kota ? `/api/lokasi?kota=${encodeURIComponent(kota)}` : "/api/lokasi";
 
-            document.getElementById("lokasi").innerHTML = data.kota;
-            document.getElementById("negara").innerHTML = data.koordinat;
-        })
-        .catch(error => {
-            console.error(error);
-        });
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.message) {
+                        alert(data.message);
+                        return;
+                    }
+                    document.getElementById("valLokasi").innerText = data.lokasi;
+                    document.getElementById("valNegara").innerText = data.negara;
+                    document.getElementById("valProvinsi").innerText = data.provinsi;
+                    document.getElementById("valKecamatan").innerText = data.kecamatan;
+                    document.getElementById("valLong").innerText = data.longitude;
+                    document.getElementById("valLat").innerText = data.latitude;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        // Load data default saat pertama buka
+        window.onload = () => cariLokasi();
     </script>
 </body>
 </html>
