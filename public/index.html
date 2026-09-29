@@ -15,7 +15,7 @@
     </p>
 
     <hr>
-    
+
     <p>
         Koordinat: 
         <span id="negara"></span>
@@ -26,7 +26,13 @@
         .then(response => response.json())
         .then(data => {
             console.log(data);
+
+            document.getElementById("lokasi").innerHTML = data.kota;
+            document.getElementById("negara").innerHTML = data.Koordinat;
         })
+        .catch(error => {
+            console.error(error);
+        });
     </script>
 </body>
 </html>
